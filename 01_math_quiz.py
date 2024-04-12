@@ -1,26 +1,46 @@
 import random
+import math
 
 
-def int_checker(question):
+def int_checker(question, low=None, high=None, exit_code=None):
+    # if any integer is allowed...
+
+    if low is None and high is None:
+        print()
+        error = "Please enter an integer"
+        print()
+
+    # If the number needs to be more than an integer (ie: rounds / high number)
+
+    elif low is not None and high is None:
+        print()
+        error = f"please enter an integer that is more than / equal to {low}"
+        print()
+    else:
+        print()
+        error = f"Please enter an integer that is between {low} and {high} inclusive"
+        print()
     while True:
-        error = "Please enter an integer that is 1 or more"
+        response = input(question).lower()
 
-        to_check = input(question
-                         )
-        # check for infinite mode
-        if to_check == "":
-            return "infinite"
+        if response == exit_code:
+            return response
 
         try:
-            response = int(to_check)
+            response = int(response)
 
-            # Checks that the number is more than / equal to 1
+            # if response is valid, return it
 
-            if response < 1:
+            # check the integer is not too low...
+            if low is not None and response < low:
+                print(error)
+
+            elif high is not None and response > high:
                 print(error)
 
             else:
                 return response
+            # Checks that the number is more than / equal to 13
 
         except ValueError:
             print(error)
@@ -40,6 +60,25 @@ def yes_no(question):
             print()
 
 
+def operation_checker(question):
+    while True:
+
+        op_wanted = input(question).lower()
+
+        if op_wanted == "x":
+            return "x"
+        elif op_wanted == "/":
+            return "/"
+        elif op_wanted == "-":
+            return "-"
+        elif op_wanted == "":
+            return "all operations"
+        else:
+            print()
+            print("I'm sorry, that is not a valid operation. Please choose x, (multiply), - (subtract), or / (divide)")
+            print()
+
+
 def instructions():
     print(''' 
 
@@ -49,14 +88,141 @@ def instructions():
     you want to use ( + , - , x, and / (division))
     
     You may also choose a difficulty level to push your skills.
+    
+    Type "xxx" if you want to quit midway through a quiz. 
 
     Good luck!
     ''')
 
+
+# initialize game variables
+
+mode = "regular"
+end_game = "no"
+questions_asked = 0
+quiz_history = []
+correct = 0
+incorrect = 0
+
+print()
+print(" 🧮 Math Quiz 🧮")
+print()
 
 want_instructions = yes_no("Do you want to view instructions? ")
 
 if want_instructions == "yes":
     instructions()
 
+# setting game parameters
 
+questions_wanted = int_checker("How many questions do you want? Push <enter> for infinite mode: ", low=1, exit_code="")
+print()
+
+if questions_wanted == "":
+    mode = "infinite"
+    questions_wanted = 10
+
+operation = operation_checker("What operation do you want your questions to be? (<enter> for mixed questions) ")
+
+print()
+default_setting = yes_no("Do you want to use the default number range? (1 - 10) \t")
+
+if default_setting == "yes":
+    low_num = 1
+    high_num = 10
+else:
+    low_num = int_checker("Choose a minimum number: ")
+    high_num = int_checker("Choose a maximum number", low=low_num + 1)
+
+# main game loop starts here.
+
+while questions_asked < questions_wanted:
+
+    if mode == "infinite":
+        rounds_heading = f"\n ♾♾♾ Question {questions_asked + 1} (Infinite mode) ♾♾♾"
+        questions_wanted += 1
+    else:
+        rounds_heading = f"\n 🕰🕰🕰 Question {questions_asked + 1} / {questions_wanted} 🕰🕰🕰 "
+
+    print(rounds_heading)
+    print()
+
+    # generate equation / the equation formatted in a way that it can be solved by the computer, as well as
+    # asking the user
+
+    equation_num1 = random.randint(low_num, high_num)
+    equation_num2 = random.randint(low_num, high_num)
+
+    if operation == "/":
+        for_div = equation_num1 * equation_num2
+        ask_equ = f"{for_div} / {equation_num2}"
+    else:
+        ask_equ = f"{equation_num1} {operation} {equation_num2}"
+
+    if operation == "x":
+        solve_equ = equation_num1 * equation_num2
+    elif operation == "-":
+        solve_equ = equation_num1 - equation_num2
+    elif operation == "/":
+        solve_equ = for_div / equation_num2
+    elif operation == "+":
+        solve_equ = equation_num1 + equation_num2
+
+    user_input = int_checker(f"What's {ask_equ}? ", low=0)
+
+    # user feedback on right/wrong answer
+
+    if user_input != solve_equ:
+        print()
+        print(f"I'm sorry, that's wrong. The answer is {solve_equ} .")
+        incorrect += 1
+        quiz_history.append(f"{questions_asked} / {questions_wanted}. Wrong! The answer was {solve_equ}")
+
+    elif user_input == solve_equ:
+        print()
+        print("Correct!")
+        correct += 1
+        quiz_history.append(f"{questions_asked} / {questions_wanted}. Right! The answer was {solve_equ}")
+
+    elif user_input == "xxx":
+        end_game = "yes"
+        break
+
+    questions_asked += 1
+
+# game loop ends here
+
+if questions_asked == questions_wanted or end_game == "yes" and questions_asked > 0:
+
+    total_correct = correct
+    total_incorrect = incorrect
+    success_rate = correct / questions_asked * 100
+
+    print()
+    print("📈 Game Stats 📉")
+    print()
+    print()
+    print(f"Total Correct = {total_correct} |\t"
+          f"Total Wrong = {total_incorrect} |\t"
+          f"Success Rate = {success_rate:.0f}%")
+    print()
+    want_history = yes_no("Do you want to view your game history? ")
+
+    if want_history == "yes":
+
+        print()
+
+        for item in quiz_history:
+            print(item)
+
+    print("Thank you for playing!")
+
+else:
+    print("Goodbye!")
+
+    # num_1 < generated > = 3
+    # num_2 < generated > = 4
+    # answer = 12
+    #
+    # for division
+    #     'answer' / num_1 = 4
