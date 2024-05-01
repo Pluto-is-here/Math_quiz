@@ -67,6 +67,8 @@ def operation_checker(question):
 
         if op_wanted == "x":
             return "x"
+        elif op_wanted == "+":
+            return "+"
         elif op_wanted == "/":
             return "/"
         elif op_wanted == "-":
@@ -86,8 +88,6 @@ def instructions():
 
     In this math quiz, you will test and improve your math skills. You may choose what type of operation
     you want to use ( + , - , x, and / (division))
-    
-    You may also choose a difficulty level to push your skills.
     
     Type "xxx" if you want to quit midway through a quiz. 
 
@@ -120,23 +120,24 @@ if want_instructions == "yes":
 questions_wanted = int_checker("How many questions do you want? Push <enter> for infinite mode: ", low=1, exit_code="")
 print()
 
+# making sure that questions asked never equals questions answered for infinite mode
+
 if questions_wanted == "":
     mode = "infinite"
     questions_wanted = 10
 
 operation = operation_checker("What operation do you want your questions to be? ")
 
-
 print()
 default_setting = yes_no("Do you want to use the default range? (1-10)\t"
-                         "Note: For division mode, this means that the answers will be between 1-10\t ")
+                         "(Note: For division mode, this means that the answers will be between 1-10) ")
 
 if default_setting == "yes":
     low_num = 1
     high_num = 10
 else:
     low_num = int_checker("Choose a minimum number: ")
-    high_num = int_checker("Choose a maximum number", low=low_num + 1)
+    high_num = int_checker("Choose a maximum number: ", low=low_num + 1)
 
 # main game loop starts here.
 
@@ -151,53 +152,58 @@ while questions_asked < questions_wanted:
     print(rounds_heading)
     print()
 
-# generate equation / the equation
+    # generate equation / the equation
 
     equation_num1 = random.randint(low_num, high_num)
     equation_num2 = random.randint(low_num, high_num)
 
-# dual-purpose code for making division easier, as well as generate questions for the user
+    # dual-purpose code for making division easier, as well as generate questions for the user
 
     if operation == "/":
         for_div = equation_num1 * equation_num2
         ask_equ = f"{for_div} / {equation_num2}"
+    elif operation == "-":
+        if equation_num2 >= equation_num1:
+            ask_equ = f"{equation_num2} {operation} {equation_num1}"
+        else:
+            ask_equ = f"{equation_num1} {operation} {equation_num2}"
     else:
         ask_equ = f"{equation_num1} {operation} {equation_num2}"
-# generating the questions in a way that the computer can solve them (to get answers the check against)
+    # generating the questions in a way that the computer can solve them (to get answers the check against)
 
     if operation == "x":
         solve_equ = equation_num1 * equation_num2
     elif operation == "-":
-        if equation_num1 > equation_num2:
-            solve_equ = equation_num1 - equation_num2
-        elif equation_num2 > equation_num1:
+        if equation_num2 > equation_num1:
             solve_equ = equation_num2 - equation_num1
+        else:
+            solve_equ = equation_num1 - equation_num2
     elif operation == "/":
         solve_equ = for_div / equation_num2
     elif operation == "+":
         solve_equ = equation_num1 + equation_num2
 
-# asking user question for input
+    # asking user question for input
 
-    user_input = int_checker(f"What's {ask_equ}? ", low=0)
+    user_input = int_checker(f"What's {ask_equ}? ", low=0, exit_code="xxx")
 
-# user feedback on right/wrong answer
+    # user feedback on right/wrong answer
 
-    if user_input != solve_equ:
+    if user_input == "xxx":
+        end_game = "yes"
+        break
+
+    elif user_input != solve_equ:
         print()
         print(f"I'm sorry, that's wrong. The answer is {solve_equ} .")
         incorrect += 1
-        quiz_history.append(f"Question {questions_asked + 1 }:  Wrong! The answer was {solve_equ}")
+        quiz_history.append(f"Question {questions_asked + 1}: {ask_equ} : Wrong! The answer was {solve_equ}")
 
     elif user_input == solve_equ:
         print()
         print("Correct!")
         correct += 1
-        quiz_history.append(f" Question {questions_asked + 1 }: Right! The answer was {solve_equ}")
-
-    elif user_input == "xxx":
-        end_game = "yes"
-        break
+        quiz_history.append(f" Question {questions_asked + 1}: {ask_equ} : Right! The answer was {solve_equ}")
 
     questions_asked += 1
 
@@ -226,6 +232,7 @@ if questions_asked == questions_wanted or end_game == "yes" and questions_asked 
         for item in quiz_history:
             print(item)
 
+    print()
     print("Thank you for playing!")
 
 else:
