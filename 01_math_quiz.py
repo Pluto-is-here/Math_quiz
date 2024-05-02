@@ -96,10 +96,10 @@ def instructions():
     ''')
 
 
-# initialize game variables
+# initialize quiz variables
 
 mode = "regular"
-end_game = "no"
+end_quiz = "no"
 questions_asked = 0
 quiz_history = []
 correct = 0
@@ -116,7 +116,7 @@ want_instructions = yes_no("Do you want to view instructions? ")
 if want_instructions == "yes":
     instructions()
 
-# setting game parameters
+# setting quiz parameters
 
 questions_wanted = int_checker("How many questions do you want? Push <enter> for infinite mode: ", low=1, exit_code="")
 print()
@@ -140,7 +140,7 @@ else:
     low_num = int_checker("Choose a minimum number: ")
     high_num = int_checker("Choose a maximum number: ", low=low_num + 1)
 
-# main game loop starts here.
+# main quiz loop starts here.
 
 while questions_asked < questions_wanted:
 
@@ -158,11 +158,12 @@ while questions_asked < questions_wanted:
     equation_num1 = random.randint(low_num, high_num)
     equation_num2 = random.randint(low_num, high_num)
 
-    # dual-purpose code for making division easier, as well as generate questions for the user
-
+    # Generating questions for the user to read
+    # Making sure that division questions are always integers
     if operation == "/":
         for_div = equation_num1 * equation_num2
         ask_equ = f"{for_div} / {equation_num2}"
+        # Making it so that subtraction question answers are always positive
     elif operation == "-":
         if equation_num2 >= equation_num1:
             ask_equ = f"{equation_num2} {operation} {equation_num1}"
@@ -170,12 +171,13 @@ while questions_asked < questions_wanted:
             ask_equ = f"{equation_num1} {operation} {equation_num2}"
     else:
         ask_equ = f"{equation_num1} {operation} {equation_num2}"
-    # generating the questions in a way that the computer can solve them (to get answers the check against)
+
+    # generating the questions in a way that the computer can solve them (to get answers to check against)
 
     if operation == "x":
         solve_equ = equation_num1 * equation_num2
     elif operation == "-":
-        if equation_num2 > equation_num1:
+        if equation_num2 >= equation_num1:
             solve_equ = equation_num2 - equation_num1
         else:
             solve_equ = equation_num1 - equation_num2
@@ -191,39 +193,43 @@ while questions_asked < questions_wanted:
     # user feedback on right/wrong answer
 
     if user_input == "xxx":
-        end_game = "yes"
+        end_quiz = "yes"
         break
 
     elif user_input != solve_equ:
         print()
-        print(f"I'm sorry, that's wrong. The answer is {solve_equ:.0f} .")
+        print(f" I'm sorry, that's wrong. The answer is {solve_equ:.0f} .")
         incorrect += 1
-        quiz_history.append(f"Question {questions_asked + 1}: {ask_equ} : Wrong! The answer was {solve_equ:.0f}")
+        quiz_history.append(f"❌ Question {questions_asked + 1}: {ask_equ} : Wrong! The answer was {solve_equ:.0f}")
 
     elif user_input == solve_equ:
         print()
         print("Correct!")
         correct += 1
-        quiz_history.append(f" Question {questions_asked + 1}: {ask_equ} : Right! The answer was {solve_equ:.0f}")
+        quiz_history.append(f"✅ Question {questions_asked + 1}: {ask_equ} : Right! The answer was {solve_equ:.0f}")
 
     questions_asked += 1
 
-# game loop ends here
+# quiz loop ends here
 
-if questions_asked == questions_wanted or end_game == "yes" and questions_asked > 0:
+# calculating quiz stats
+if questions_asked == questions_wanted or end_quiz == "yes" and questions_asked > 0:
 
     total_correct = correct
     total_incorrect = incorrect
     success_rate = correct / questions_asked * 100
 
     print()
-    print("📈 Game Stats 📉")
+    print("📈 Quiz Stats 📉")
     print()
     print()
     print(f"Total Correct = {total_correct} |\t"
           f"Total Wrong = {total_incorrect} |\t"
           f"Success Rate = {success_rate:.0f}%")
     print()
+
+    # optional history of quiz w/ right or wrong answers
+
     want_history = yes_no("Do you want to view your quiz history? ")
 
     if want_history == "yes":
