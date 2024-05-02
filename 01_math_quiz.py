@@ -77,7 +77,8 @@ def operation_checker(question):
             return "all operations"
         else:
             print()
-            print("I'm sorry, that is not a valid operation. Please choose x, (multiply), - (subtract), or / (divide)")
+            print("I'm sorry, that is not a valid operation. Please choose x, (multiply), - (subtract),  / (divide) or"
+                  "+ (add")
             print()
 
 
@@ -186,7 +187,7 @@ while questions_asked < questions_wanted:
     # asking user question for input
 
     user_input = int_checker(f"What's {ask_equ}? ", low=0, exit_code="xxx")
-
+    print()
     # user feedback on right/wrong answer
 
     if user_input == "xxx":
@@ -195,15 +196,15 @@ while questions_asked < questions_wanted:
 
     elif user_input != solve_equ:
         print()
-        print(f"I'm sorry, that's wrong. The answer is {solve_equ} .")
+        print(f"I'm sorry, that's wrong. The answer is {solve_equ:.0f} .")
         incorrect += 1
-        quiz_history.append(f"Question {questions_asked + 1}: {ask_equ} : Wrong! The answer was {solve_equ}")
+        quiz_history.append(f"Question {questions_asked + 1}: {ask_equ} : Wrong! The answer was {solve_equ:.0f}")
 
     elif user_input == solve_equ:
         print()
         print("Correct!")
         correct += 1
-        quiz_history.append(f" Question {questions_asked + 1}: {ask_equ} : Right! The answer was {solve_equ}")
+        quiz_history.append(f" Question {questions_asked + 1}: {ask_equ} : Right! The answer was {solve_equ:.0f}")
 
     questions_asked += 1
 
@@ -223,7 +224,7 @@ if questions_asked == questions_wanted or end_game == "yes" and questions_asked 
           f"Total Wrong = {total_incorrect} |\t"
           f"Success Rate = {success_rate:.0f}%")
     print()
-    want_history = yes_no("Do you want to view your game history? ")
+    want_history = yes_no("Do you want to view your quiz history? ")
 
     if want_history == "yes":
 
