@@ -14,7 +14,7 @@ def int_checker(question, low=None, high=None, exit_code=None):
 
     elif low is not None and high is None:
         print()
-        error = f"please enter an integer that is more than / equal to {low}"
+        error = f"Please enter an integer that is more than / equal to {low}"
         print()
     else:
         print()
@@ -78,7 +78,7 @@ def operation_checker(question):
         else:
             print()
             print("I'm sorry, that is not a valid operation. Please choose x, (multiply), - (subtract),  / (divide) or"
-                  "+ (add")
+                  " + (add")
             print()
 
 
@@ -136,8 +136,11 @@ default_setting = yes_no("Do you want to use the default range? (1-10)\t"
 if default_setting == "yes":
     low_num = 1
     high_num = 10
+elif operation == "/":
+    low_num = int_checker("Choose a minimum number (can't be 0): ", low=1)
+    high_num = int_checker("Choose a maximum number: ", low=low_num + 1)
 else:
-    low_num = int_checker("Choose a minimum number: ")
+    low_num = int_checker("Choose a minimum number: ", low=0)
     high_num = int_checker("Choose a maximum number: ", low=low_num + 1)
 
 # main quiz loop starts here.
